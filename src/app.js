@@ -1,12 +1,17 @@
-import {Platform} from 'react-native';
-import {Navigation} from 'react-native-navigation';
-import {registerScreens} from './routes';
 
-registerScreens();
+import { Navigation } from 'react-native-navigation';
+import { Provider } from 'react-redux';
+
+import { registerScreens } from './routes';
+import configureStore from './store/configureStore';
+
+const store = configureStore();
+
+registerScreens(store, Provider);
 
 Navigation.startSingleScreenApp({
-  screen: {
-    screen: 'Landing',
-    title: 'Welcome'
-  }
+	screen: {
+		screen: 'Landing',
+		title: 'Welcome'
+	}
 });

@@ -46,6 +46,11 @@ public class MainApplication extends NavigationApplication {
   // }
 
   @Override
+  public String getJSMainModuleName() {
+      return "index";
+  }
+
+  @Override
   public boolean isDebug() {
     // Make sure you are using BuildConfig from your own application
     return BuildConfig.DEBUG;
