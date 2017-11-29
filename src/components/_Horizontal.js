@@ -8,8 +8,7 @@ import {
 	ActivityIndicator,
 	FlatList,
 	TouchableOpacity,
-	StyleSheet,
-	Animated
+	StyleSheet
 } from 'react-native';
 import { connect } from 'react-redux';
 
@@ -32,20 +31,25 @@ class Horizontal extends PureComponent {
 		this.makeAPIRequest();
 	}
 
-	getItemLayout = (data, index) => ({ length: cardHeight, offset: cardHeight * index, index });
-
-	setAnim = anim => (this.anim = anim);
+	onEndReached = () => {
+		if (!this.props.apiBundle.isEndList) {
+			this.makeAPIRequest();
+		}
+	};
 
 	makeAPIRequest = () => {
 		const { propUrl, propObj } = this.props;
 
+		const headerObject = {
+			Accept: 'application/json',
+			'Content-Type': 'application/json',
+			'Cache-Control': 'default'
+		};
+
 		const API_ENDPOINT = propUrl;
 		const API_OBJECT = {
 			method: 'POST',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json'
-			},
+			headers: headerObject,
 			body: JSON.stringify({
 				CategoryID: propObj.CategoryID,
 				CategoryTypeID: propObj.CategoryTypeID,
@@ -57,24 +61,9 @@ class Horizontal extends PureComponent {
 				MicroAppProfileID: null
 			})
 		};
-
 		this.props.callService(API_ENDPOINT, API_OBJECT);
 
 		this.page += 1;
-	};
-
-	finishedAnim = () => {
-		this.state.progress.setValue(0);
-		Animated.timing(this.state.progress, {
-			toValue: 1,
-			duration: 1000
-		}).start(({ finished }) => {
-			if (finished) {
-				this.isShowingAnimation = false;
-				this.forceUpdate();
-				this.makeAPIRequest();
-			}
-		});
 	};
 
 	flipFollow = rowItem => {
@@ -174,8 +163,8 @@ class Horizontal extends PureComponent {
 
 	render() {
 		// console.log(this.props);
+
 		return (
-			// this.state.loading ? <View><Text>Loading</Text></View> :
 			<View style={{ flex: 1 }}>
 				<FlatList
 					horizontal
@@ -185,9 +174,8 @@ class Horizontal extends PureComponent {
 					renderItem={rowData => this.renderRow(rowData)}
 					keyExtractor={item => item.AlbumID}
 					ListFooterComponent={this.renderFooterEnd}
-					onEndReached={() => this.state.progress.setValue(0)}
+					onEndReached={this.onEndReached}
 					onEndReachedThreshold={0.5}
-					onMomentumScrollEnd={this.finishedAnim}
 				/>
 			</View>
 		);

@@ -5,3 +5,5 @@ export const SERVICE_ERROR = 'SERVICE_ERROR';
 export const SERVICE_PENDING = 'SERVICE_PENDING';
 
 export const MUTATE_DATA = 'MUTATE_DATA';
+
+export const END_LIST = 'END_LIST';

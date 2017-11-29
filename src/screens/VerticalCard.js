@@ -24,7 +24,7 @@ class VerticalCard extends Component {
 			// {
 			// 	CategoryID: 6,
 			// 	CategoryTypeID: 1
-			// },
+			// }
 			// {
 			// 	CategoryID: 10,
 			// 	CategoryTypeID: 1
