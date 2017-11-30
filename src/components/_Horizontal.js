@@ -8,13 +8,17 @@ import {
 	ActivityIndicator,
 	FlatList,
 	TouchableOpacity,
-	StyleSheet
+	StyleSheet,
+	Animated
 } from 'react-native';
 import { connect } from 'react-redux';
+import Animation from 'lottie-react-native';
 
 import CardUI from './_HorizontalCard';
 
 import { callWebservice, mutateData } from '../actions/apiActions';
+
+import TwitterHeart from '../animations/TwitterHeart.json';
 
 const cardHeight = 300;
 const cardWidth = 200;
@@ -23,7 +27,9 @@ const colorFollow = 'royalblue';
 class Horizontal extends PureComponent {
 	constructor(props) {
 		super(props);
-
+		this.state = {
+			progress: new Animated.Value(0)
+		};
 		this.page = 1;
 	}
 
@@ -35,6 +41,25 @@ class Horizontal extends PureComponent {
 		if (!this.props.apiBundle.isEndList) {
 			this.makeAPIRequest();
 		}
+	};
+
+	getItemLayout = (data, index) => ({ length: cardHeight, offset: cardHeight * index, index });
+
+	setAnim = anim => (this.anim = anim);
+
+	finishedAnim = () => {
+		this.state.progress.setValue(0);
+		Animated.timing(this.state.progress, {
+			toValue: 1,
+			duration: 1000
+		}).start(({ finished }) => {
+			if (finished) {
+				this.isShowingAnimation = false;
+				if (!this.props.apiBundle.isEndList) {
+					this.makeAPIRequest();
+				}
+			}
+		});
 	};
 
 	makeAPIRequest = () => {
@@ -95,11 +120,29 @@ class Horizontal extends PureComponent {
 		);
 	};
 
-	renderFooterEnd = () => (
-		<View style={{ height: cardHeight, width: cardWidth, justifyContent: 'center' }}>
-			<ActivityIndicator />
-		</View>
-	);
+	renderFooterEnd = () => {
+		const animationSection = (
+			<View
+				style={{
+					height: cardHeight,
+					width: cardWidth
+				}}
+			>
+				<Animation
+					ref={this.setAnim}
+					style={{
+						height: 200,
+						width: cardWidth,
+						marginTop: 20
+					}}
+					source={TwitterHeart}
+					progress={this.state.progress}
+					enableMergePathsAndroidForKitKatAndAbove
+				/>
+			</View>
+		);
+		return <View>{animationSection}</View>;
+	};
 
 	renderRow = item => {
 		const { AlbumCover, AlbumName, MomentDate } = item.item;
@@ -163,7 +206,6 @@ class Horizontal extends PureComponent {
 
 	render() {
 		// console.log(this.props);
-
 		return (
 			<View style={{ flex: 1 }}>
 				<FlatList
@@ -174,8 +216,9 @@ class Horizontal extends PureComponent {
 					renderItem={rowData => this.renderRow(rowData)}
 					keyExtractor={item => item.AlbumID}
 					ListFooterComponent={this.renderFooterEnd}
-					onEndReached={this.onEndReached}
+					onEndReached={() => this.state.progress.setValue(0)}
 					onEndReachedThreshold={0.5}
+					onMomentumScrollEnd={this.finishedAnim}
 				/>
 			</View>
 		);
