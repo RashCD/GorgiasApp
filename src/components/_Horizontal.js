@@ -5,7 +5,6 @@ import {
 	View,
 	Text,
 	ImageBackground,
-	ActivityIndicator,
 	FlatList,
 	TouchableOpacity,
 	StyleSheet,
